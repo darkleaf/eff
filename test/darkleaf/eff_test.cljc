@@ -71,3 +71,18 @@
         report (with-redefs [t/do-report identity]
                  (eff/test cont script))]
     (t/is (= :fail (:type report)))))
+
+(t/deftest loop!-recur!
+  (let [cont   (fn []
+                 (eff/loop! [i 0]
+                   (when (< i 2)
+                     (eff/let! [_ [:prn i]]
+                       ;; may be implement eff/recur! ?
+                       (recur! (inc i))))))
+        script [{:args []}
+                {:effect   [:prn 0]
+                 :coeffect nil}
+                {:effect   [:prn 1]
+                 :coeffect nil}
+                {:return nil}]]
+    (eff/test cont script)))

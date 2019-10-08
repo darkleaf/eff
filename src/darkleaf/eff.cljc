@@ -2,7 +2,8 @@
   (:refer-clojure :exclude [test])
   #?(:cljs (:require-macros [darkleaf.eff :refer [<<-]]))
   (:require
-   [clojure.test :as t]))
+   [clojure.test :as t]
+   [clojure.walk :as w]))
 
 (defmacro <<- [& body]
   (when (seq body)
@@ -30,9 +31,19 @@
         (vector? expr) `(vary-meta ~expr assoc ::continuation ~cont)
         (seq? expr)    `(continue-impl ~expr ~cont)))))
 
+(defmacro loop!
+  {:style/indent :defn}
+  [bindings & body]
+  {:pre [(-> bindings count even?)]}
+  (let [loop-name      (gensym "loop-name")
+        form           (w/macroexpand-all `(do ~@body))
+        form           (w/prewalk-replace {'recur! loop-name} form)
+        bindings-names (->> bindings (partition 2) (map first))
+        bindings-vals  (->> bindings (partition 2) (map second))]
+    `(letfn [(~loop-name [~@bindings-names] ~form)]
+       (~loop-name ~@bindings-vals))))
+
 (comment
-  (defmacro loop! [])
-  (defmacro recur! [])
   (defn transduce))
 
 (defn- process-first-item [{:keys [report continuation]} {:keys [args]}]
