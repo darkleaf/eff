@@ -43,6 +43,10 @@
     `(letfn [(~loop-name [~@bindings-names] ~form)]
        (~loop-name ~@bindings-vals))))
 
+(defmacro ! [effect]
+  `(let! [value# ~effect]
+     value#))
+
 (comment
   (defn transduce))
 

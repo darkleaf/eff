@@ -86,3 +86,12 @@
                  :coeffect nil}
                 {:return nil}]]
     (eff/test cont script)))
+
+(t/deftest !
+  (let [cont   (fn [x]
+                 (eff/! [:prn x]))
+        script [{:args [:ok]}
+                {:effect   [:prn :ok]
+                 :coeffect :value}
+                {:return :value}]]
+    (eff/test cont script)))
