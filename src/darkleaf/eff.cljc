@@ -1,5 +1,6 @@
 (ns darkleaf.eff
   (:refer-clojure :exclude [test])
+  #?(:cljs (:require-macros [darkleaf.eff :refer [<<-]]))
   (:require
    [clojure.test :as t]))
 
