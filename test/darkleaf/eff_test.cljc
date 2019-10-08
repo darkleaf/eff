@@ -62,3 +62,12 @@
         script [{:args [[1 2 3]]}
                 {:return [2 3 4]}]]
     (eff/test cont script)))
+
+(t/deftest test-fail
+  (let [cont   (fn []
+                 :ok)
+        script [{:args []}
+                {:return :fail}]
+        report (with-redefs [t/do-report identity]
+                 (eff/test cont script))]
+    (t/is (= :fail (:type report)))))
