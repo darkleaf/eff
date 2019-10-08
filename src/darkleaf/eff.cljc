@@ -19,7 +19,7 @@
 (defmacro let!
   {:style/indent :defn}
   [bindings & body]
-  (assert (-> bindings count even?))
+  {:pre [(-> bindings count even?)]}
   (if (empty? bindings)
     `(do ~@body)
     (let [[name expr & bindings] bindings
