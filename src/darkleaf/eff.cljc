@@ -36,8 +36,9 @@
   [bindings & body]
   {:pre [(-> bindings count even?)]}
   (let [loop-name      (gensym "loop-name")
-        form           (w/macroexpand-all `(do ~@body))
-        form           (w/prewalk-replace {'recur! loop-name} form)
+        form (->> `(do ~@body)
+                  (w/macroexpand-all)
+                  (w/prewalk-replace {'recur! loop-name}))
         bindings-names (->> bindings (partition 2) (map first))
         bindings-vals  (->> bindings (partition 2) (map second))]
     `(letfn [(~loop-name [~@bindings-names] ~form)]
