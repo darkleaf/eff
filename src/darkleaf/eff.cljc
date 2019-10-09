@@ -44,9 +44,9 @@
     `(letfn [(~loop-name [~@bindings-names] ~form)]
        (~loop-name ~@bindings-vals))))
 
-(defmacro ! [effect]
-  `(let! [value# ~effect]
-     value#))
+(defn ! [effect]
+  {:pre [(vector? effect)]}
+  (vary-meta effect assoc ::continuation identity))
 
 (comment
   (defn transduce))
