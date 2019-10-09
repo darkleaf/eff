@@ -77,7 +77,8 @@
                  (eff/loop! [i 0]
                    (when (< i 2)
                      (eff/let! [_ [:prn i]]
-                       (eff/recur! (inc i))))))
+                       ;; may be implement eff/recur! ?
+                       (recur! (inc i))))))
         script [{:args []}
                 {:effect   [:prn 0]
                  :coeffect nil}

@@ -31,32 +31,17 @@
         (vector? expr) `(vary-meta ~expr assoc ::continuation ~cont)
         (seq? expr)    `(continue-impl ~expr ~cont)))))
 
-
-(defn- fixup-aliases [sym]
-  (let [aliases  (->> (ns-aliases *ns*)
-                      (reduce-kv (fn [acc k v] (assoc acc (str k) (str v))) {}))
-        sym-ns   (namespace sym)
-        sym-name (name sym)]
-    (if-some [full-ns (get aliases sym-ns)]
-      (symbol full-ns sym-name)
-      sym)))
-
 (defmacro loop!
   {:style/indent :defn}
   [bindings & body]
   {:pre [(-> bindings count even?)]}
   (let [loop-name      (gensym "loop-name")
-        form (->> `(do ~@body)
-                  (w/macroexpand-all)
-                  (w/prewalk #(if (symbol? %) (fixup-aliases %) %))
-                  (w/prewalk-replace {`recur! loop-name}))
+        form           (w/macroexpand-all `(do ~@body))
+        form           (w/prewalk-replace {'recur! loop-name} form)
         bindings-names (->> bindings (partition 2) (map first))
         bindings-vals  (->> bindings (partition 2) (map second))]
     `(letfn [(~loop-name [~@bindings-names] ~form)]
        (~loop-name ~@bindings-vals))))
-
-(defn recur! [& values]
-  (assert nil "recur! used not in (loop! ...) block"))
 
 (defmacro ! [effect]
   `(let! [value# ~effect]
